@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import getBlockchain from './ethereum';
+import { Pie } from './react-chartjs-2';
 
 const SIDE = {
   BIDEN: 0,
@@ -10,6 +11,7 @@ function App() {
 
   const [predictionMarket, setPredictionMarket] = useState(undefined)
   const [myBets, setMyBets] = useState(undefined)
+  const [betPredictions, setBetPredictions] = useState(undefined)
 
   useEffect(() => { // (*)
     const init = async () => { // useEffect doesn't accept async callback (*), so we have to create it inside
@@ -18,12 +20,26 @@ function App() {
         predictionMarket.betsPerGambler(signerAddress, SIDE.BIDEN),
         predictionMarket.betsPerGambler(signerAddress, SIDE.TRUMP),
       ])
+
+      const bets = await Promise.all([
+        predictionMarket.bets(SIDE.BIDEN),
+        predictionMarket.bets(SIDE.TRUMP),
+      ])
+      const betPredictions = {
+        labels: ['Biden','Trump'],
+        datasets: [{
+          data: [bets[0].toString(), bets[1].toString()],
+          backgroundColor: ['#36A2EB', '#FF6384'],
+          hoverBackgroundColor: ['#36A2EB', '#FF6384'],
+        }]
+      }
+
       setPredictionMarket(predictionMarket)
       setMyBets(myBets)
     }
   }, []) // Only first load
 
-  if (typeof predictionMarket === 'undefined' || typeof myBets === 'undefined')
+  if (typeof predictionMarket === 'undefined' || typeof myBets === 'undefined' || typeof betPredictions === 'undefined')
     return 'Loading...'
 
   const placeBet = async (side, e) => {
@@ -43,6 +59,8 @@ function App() {
           <h1 className='text-center'>Prediction Market</h1>
           <div className='jumbotron'>
             <h1 className='display-4 text-center'>Who will win the US election?</h1>
+            <p className='lead text-center'>Current odds</p>
+            <div><Pie data={betPredictions} /></div>
           </div>
         </div>
       </div>
