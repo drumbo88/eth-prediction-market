@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import getBlockchain from './ethereum';
-import { Pie } from './react-chartjs-2';
+import { Pie } from 'react-chartjs-2';
 
 const SIDE = {
   BIDEN: 0,
@@ -25,18 +25,19 @@ function App() {
         predictionMarket.bets(SIDE.BIDEN),
         predictionMarket.bets(SIDE.TRUMP),
       ])
-      const betPredictions = {
+      setBetPredictions({
         labels: ['Biden','Trump'],
         datasets: [{
           data: [bets[0].toString(), bets[1].toString()],
           backgroundColor: ['#36A2EB', '#FF6384'],
           hoverBackgroundColor: ['#36A2EB', '#FF6384'],
         }]
-      }
+      })
 
       setPredictionMarket(predictionMarket)
       setMyBets(myBets)
     }
+    init()
   }, []) // Only first load
 
   if (typeof predictionMarket === 'undefined' || typeof myBets === 'undefined' || typeof betPredictions === 'undefined')
@@ -119,8 +120,7 @@ function App() {
           <li>Trump: {myBets[SIDE.TRUMP].toString()} ETH (wei)</li>
         </ul>
       </div>
-
-      { electionFinished() ? <WithdrawGain /> : <FinishBet /> }
+      { electionFinished() ? <WithdrawGain /> : <FinishElection /> }
     </div>
   );
 }
