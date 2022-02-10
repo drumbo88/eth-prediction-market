@@ -51,6 +51,28 @@ function App() {
   const withdrawGain = async () => {
     await predictionMarket.withdrawGain()
   }
+  const WithdrawGain = (
+    <div className='row'>
+      <h2>Claim your gains, if any, after the election</h2>
+      <button type="submit" className="btn btn-primary mb-2" onClick={e => withdrawGain()}>
+        Claim 
+      </button>
+    </div>
+  )
+  const electionFinished = async () => {
+    await predictionMarket.electionFinished()
+  }
+  const finishElection = async () => {
+    await predictionMarket.reportResult()
+  }
+  const FinishElection = (
+    <div className='row'>
+      <h2>Finish election</h2>
+      <button type="submit" className="btn btn-primary mb-2" onClick={e => finishElection()}>
+        Finish election 
+      </button>
+    </div>
+  )
 
   return (
     <div className='container'>
@@ -71,7 +93,7 @@ function App() {
             <div className='card-body'>
               <h5 className='card-title'>Trump</h5>
               <form className='form-inline' onSubmit={e => placeBet(SIDE.TRUMP, e)}>
-                <input type='text' className='form-control mb-2 mr-sm-2' placeholder="Bet amount (ether)"></input>
+                <input type='text' className='form-control mb-2 mr-sm-2' placeholder="Bet amount (wei)"></input>
                 <button type="submit" className="btn btn-promary mb-2">Submit</button>
               </form>
             </div>
@@ -83,7 +105,7 @@ function App() {
             <div className='card-body'>
               <h5 className='card-title'>Biden</h5>
               <form className='form-inline' onSubmit={e => placeBet(SIDE.BIDEN, e)}>
-                <input type='text' className='form-control mb-2 mr-sm-2' placeholder="Bet amount (ether)"></input>
+                <input type='text' className='form-control mb-2 mr-sm-2' placeholder="Bet amount (wei)"></input>
                 <button type="submit" className="btn btn-promary mb-2">Submit</button>
               </form>
             </div>
@@ -97,12 +119,8 @@ function App() {
           <li>Trump: {myBets[SIDE.TRUMP].toString()} ETH (wei)</li>
         </ul>
       </div>
-      <div className='row'>
-        <h2>Claim your gains, if any, after the election</h2>
-        <button type="submit" className="btn btn-primary mb-2" onClick={e => withdrawGain()}>
-          Submit 
-        </button>
-      </div>
+
+      { electionFinished() ? <WithdrawGain /> : <FinishBet /> }
     </div>
   );
 }
