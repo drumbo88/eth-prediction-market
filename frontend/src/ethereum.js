@@ -9,6 +9,9 @@ const getBlockchain = () => new Promise((resolve, reject) => {
             const signer = provider.getSigner()
             const signerAddress = await signer.getAddress()
 
+            if (!PredictionMarket.networks.hasOwnProperty(window.ethereum.networkVersion))
+                return reject("La red seleccionada es inválida.")
+
             const predictionMarket = new Contract(
                 PredictionMarket.networks[window.ethereum.networkVersion].address,
                 PredictionMarket.abi,

@@ -15,27 +15,41 @@ function App() {
 
   useEffect(() => { // (*)
     const init = async () => { // useEffect doesn't accept async callback (*), so we have to create it inside
-      const { signerAddress, predictionMarket } = await getBlockchain()
-      const myBets = await Promise.all([
-        predictionMarket.betsPerGambler(signerAddress, SIDE.BIDEN),
-        predictionMarket.betsPerGambler(signerAddress, SIDE.TRUMP),
-      ])
+      console.log("Iniciando...")
+      getBlockchain().then(async (res) => {
+        const { signerAddress, predictionMarket } = res
 
-      const bets = await Promise.all([
-        predictionMarket.bets(SIDE.BIDEN),
-        predictionMarket.bets(SIDE.TRUMP),
-      ])
-      setBetPredictions({
-        labels: ['Biden','Trump'],
-        datasets: [{
-          data: [bets[0].toString(), bets[1].toString()],
-          backgroundColor: ['#36A2EB', '#FF6384'],
-          hoverBackgroundColor: ['#36A2EB', '#FF6384'],
-        }]
+        const myBets = await Promise.all([
+          predictionMarket.betsPerGambler(signerAddress, SIDE.BIDEN),
+          predictionMarket.betsPerGambler(signerAddress, SIDE.TRUMP),
+        ])
+  
+        const bets = await Promise.all([
+          predictionMarket.bets(SIDE.BIDEN),
+          predictionMarket.bets(SIDE.TRUMP),
+        ])
+
+        setBetPredictions({
+          labels: ['Biden','Trump'],
+          datasets: [{
+            data: [bets[SIDE.BIDEN].toString(), bets[SIDE.TRUMP].toString()],
+            backgroundColor: ['#36A2EB', '#FF6384'],
+            hoverBackgroundColor: ['#36A2EB', '#FF6384'],
+          }]
+        })
+  
+        setPredictionMarket(predictionMarket)
+        setMyBets(myBets)
       })
-
-      setPredictionMarket(predictionMarket)
-      setMyBets(myBets)
+      .catch((error) => {
+        setBetPredictions({})
+        setPredictionMarket({})
+        setMyBets({
+          [SIDE.BIDEN]: 0,
+          [SIDE.TRUMP]: 0,
+        })
+        return alert(error)
+      })
     }
     init()
   }, []) // Only first load
@@ -52,7 +66,7 @@ function App() {
   const withdrawGain = async () => {
     await predictionMarket.withdrawGain()
   }
-  const WithdrawGain = (
+  const WithdrawGain = () => (
     <div className='row'>
       <h2>Claim your gains, if any, after the election</h2>
       <button type="submit" className="btn btn-primary mb-2" onClick={e => withdrawGain()}>
@@ -66,7 +80,7 @@ function App() {
   const finishElection = async () => {
     await predictionMarket.reportResult()
   }
-  const FinishElection = (
+  const FinishElection = () => (
     <div className='row'>
       <h2>Finish election</h2>
       <button type="submit" className="btn btn-primary mb-2" onClick={e => finishElection()}>
