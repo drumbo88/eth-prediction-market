@@ -55,7 +55,7 @@ function App() {
   }, []) // Only first load
 
   if (typeof predictionMarket === 'undefined' || typeof myBets === 'undefined' || typeof betPredictions === 'undefined')
-    return 'Loading...'
+    return '<h1>Loading...</h1>'
 
   const placeBet = async (side, e) => {
     e.preventDefault()
