@@ -19,21 +19,15 @@ function App() {
       getBlockchain().then(async (res) => {
         const { signerAddress, predictionMarket } = res
 
-        let myBets, bets
-        try {
-          myBets = await Promise.all([
-            predictionMarket.betsPerGambler(signerAddress, SIDE.BIDEN),
-            predictionMarket.betsPerGambler(signerAddress, SIDE.TRUMP),
-          ])
-          bets = await Promise.all([
-            predictionMarket.bets(SIDE.BIDEN),
-            predictionMarket.bets(SIDE.TRUMP),
-          ])
-        }
-        catch (err) {
-          myBets = false
-          bets = false
-        }
+        const myBets = await Promise.all([
+          predictionMarket.betsPerGambler(signerAddress, SIDE.BIDEN),
+          predictionMarket.betsPerGambler(signerAddress, SIDE.TRUMP),
+        ])
+  
+        const bets = await Promise.all([
+          predictionMarket.bets(SIDE.BIDEN),
+          predictionMarket.bets(SIDE.TRUMP),
+        ])
 
         setBetPredictions({
           labels: ['Biden','Trump'],
@@ -42,7 +36,7 @@ function App() {
             backgroundColor: ['#36A2EB', '#FF6384'],
             hoverBackgroundColor: ['#36A2EB', '#FF6384'],
           }]
-        } )
+        })
   
         setPredictionMarket(predictionMarket)
         setMyBets(myBets)
@@ -61,9 +55,7 @@ function App() {
   }, []) // Only first load
 
   if (typeof predictionMarket === 'undefined' || typeof myBets === 'undefined' || typeof betPredictions === 'undefined')
-    return <h1>Loading...</h1>
-  if (!predictionMarket || !myBets || !betPredictions)
-    return <h1>Error loading.</h1>
+    return '<h1>Loading...</h1>'
 
   const placeBet = async (side, e) => {
     e.preventDefault()
