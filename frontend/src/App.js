@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import getBlockchain from './ethereum';
-import { Pie } from 'react-chartjs-2';
+//import { Chart, Pie } from 'react-chartjs-2';
+//import { Chart, PieController } from 'chart.js';
+//Chart.register(Pie);
 
 const SIDE = {
   BIDEN: 0,
@@ -12,6 +14,7 @@ function App() {
   const [predictionMarket, setPredictionMarket] = useState(undefined)
   const [myBets, setMyBets] = useState(undefined)
   const [betPredictions, setBetPredictions] = useState(undefined)
+  const [state, setState] = useState('Loading...')
 
   useEffect(() => { // (*)
     const init = async () => { // useEffect doesn't accept async callback (*), so we have to create it inside
@@ -19,11 +22,13 @@ function App() {
       getBlockchain().then(async (res) => {
         const { signerAddress, predictionMarket } = res
 
+        console.log("Cargando mis apuestas...")
         const myBets = await Promise.all([
           predictionMarket.betsPerGambler(signerAddress, SIDE.BIDEN),
           predictionMarket.betsPerGambler(signerAddress, SIDE.TRUMP),
         ])
   
+        console.log("Cargando apuestas...")
         const bets = await Promise.all([
           predictionMarket.bets(SIDE.BIDEN),
           predictionMarket.bets(SIDE.TRUMP),
@@ -37,30 +42,27 @@ function App() {
             hoverBackgroundColor: ['#36A2EB', '#FF6384'],
           }]
         })
-  
         setPredictionMarket(predictionMarket)
         setMyBets(myBets)
       })
       .catch((error) => {
-        setBetPredictions({})
-        setPredictionMarket({})
-        setMyBets({
-          [SIDE.BIDEN]: 0,
-          [SIDE.TRUMP]: 0,
-        })
-        return alert(error)
+        console.log(error)
+        setBetPredictions(false)
+        setPredictionMarket(false)
+        setMyBets(false)
+        setState(error)
       })
     }
     init()
   }, []) // Only first load
 
-  if (typeof predictionMarket === 'undefined' || typeof myBets === 'undefined' || typeof betPredictions === 'undefined')
-    return '<h1>Loading...</h1>'
+  if (!predictionMarket || !myBets || !betPredictions)
+    return <h1>{(predictionMarket === false ? 'Error: ' : '')+state}</h1>
 
   const placeBet = async (side, e) => {
     e.preventDefault()
     await predictionMarket.placeBet(
-      side, { value: e.target.form.elements[0].value }
+      side, { value: e.target.elements[0].value }
     )
   }
   const withdrawGain = async () => {
@@ -97,14 +99,14 @@ function App() {
           <div className='jumbotron'>
             <h1 className='display-4 text-center'>Who will win the US election?</h1>
             <p className='lead text-center'>Current odds</p>
-            <div><Pie data={betPredictions} /></div>
+            {/*<div><Pie data={betPredictions} /></div>*/}
           </div>
         </div>
       </div>
       <div className='row'>
         <div className='col-sm-6'>
           <div className='card'>
-            <img src='./img/trump.png' />
+            <img src='./img/trump.png' width="200px" height="200px" alt="Trump" />
             <div className='card-body'>
               <h5 className='card-title'>Trump</h5>
               <form className='form-inline' onSubmit={e => placeBet(SIDE.TRUMP, e)}>
@@ -116,7 +118,7 @@ function App() {
         </div>
         <div className='col-sm-6'>
           <div className='card'>
-            <img src='./img/biden.png' />
+            <img src='./img/biden.png' width="200px" height="200px" alt="Biden" />
             <div className='card-body'>
               <h5 className='card-title'>Biden</h5>
               <form className='form-inline' onSubmit={e => placeBet(SIDE.BIDEN, e)}>
