@@ -5,11 +5,8 @@ const getBlockchain = () => new Promise((resolve, reject) => {
     window.addEventListener('load', async () => {
         if (!window.ethereum) 
             return reject("No se encontró wallet.")
-        if (!window.ethereum.networkVersion) {
-            console.log(window.networkVersion)
-            console.log(window.ethereum)
+        if (!window.ethereum.networkVersion) 
             return reject("Error metamask desconocido.")
-        }
 
         if (!PredictionMarket.networks.hasOwnProperty(window.ethereum.networkVersion))
             return reject("La red seleccionada es inválida (debe ser #"+window.ethereum.networkVersion+")")
