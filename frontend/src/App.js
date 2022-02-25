@@ -86,7 +86,7 @@ function App() {
     <div className='row'>
       <h2>Finish election</h2>
       <button type="submit" className="btn btn-primary mb-2" onClick={e => finishElection()}>
-        Finish election 
+        Finish election!
       </button>
     </div>
   )
