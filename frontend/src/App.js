@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react'
 import getBlockchain from './ethereum';
-//import { Chart, Pie } from 'react-chartjs-2';
-//import { Chart, PieController } from 'chart.js';
-//Chart.register(Pie);
 
 const SIDE = {
   BIDEN: 0,
